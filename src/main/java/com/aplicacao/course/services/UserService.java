@@ -1,6 +1,7 @@
 package com.aplicacao.course.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,12 @@ public class UserService {
     //fazendo um metodo para retornar os usuarios cadastrados no banco de dados
     public List<User> findAll(){
         return repository.findAll();
+    }
+
+    //metodo para buscar um usuario por id
+    public User findById(Long id){
+        Optional<User> obj = repository.findById(id);
+        return obj.get();
     }
 
 }
