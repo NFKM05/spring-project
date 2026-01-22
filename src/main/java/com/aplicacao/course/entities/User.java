@@ -13,8 +13,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
-@Entity //declarando que é uma entidade persistente
-@Table(name = "tb_user") //declarando o nome da tabela no banco de dados
+/**
+* Informa ao JPA que esta classe mapeia uma tabela no banco de dados
+* cada instancia de User sera uma linha no banco
+*/
+@Entity 
+
+/**
+* Define o nome propriamente dito da tabela no banco de dados ditando a 
+* tabela em que serao salvo estes dados e a que vai fazer associacao as demais
+*/
+@Table(name = "tb_user")
 public class User implements Serializable {
 
     /*
@@ -30,23 +39,48 @@ public class User implements Serializable {
     */
 
 
-    //para transformar o obj em cadeias de bytes para trafegar em redes e ser salvo em arquivos
+    /**
+    * Interface que permite o objeto ser transformado em um fluxo de bytes, essencial
+    * para quando o Spring precisa salvar o objeto em sessão, enviar via rede ou gravar
+    * em arquivos de cache 
+    */
     private static final long serialVersionUID=1L;
 
 
-    @Id //definindo que o id vai ser uma chave primaria 
-    @GeneratedValue(strategy = GenerationType.IDENTITY) //isso define que é auto increment no banco de dados
+    @Id //Definindo o atributo como uma chave primária da tabela
+    //Define a estrategia de geraçao de ID, delegando ao banco de dados o incremento ex:. (AUTO_INCREMENT)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    //Atributos básicos da classe, serão colunas simples no banco de dados
     private Long id;
     private String name;
     private String email;
     private String phone;
     private String password;
 
-    //esse comando do json evita que fique em loop a aplicacao, por conta da associacao de 1 para N
+    /**
+    * Interrompe a recursão infinita do JSON, como o User tem uma lista de Orders
+    * e cada Order tem um User, sem isso o JSON ficaria chamando User -> Order -> User -> Order
+    */
     @JsonIgnore
+
+    /**
+    * Define a relação de Um-Para-Muitos (1 User, muitos Pedidos)
+    * O comando mappedBy indica que o lado forte, quem possui a FK é o atributo client
+    * que está dentro da classe Order 
+    */
     @OneToMany(mappedBy = "client")
+
+    /**
+    * Sempre instanciar uma coleçao para garantir que se não houver pedidos
+    * a lista vai vir vazia de atributos e não nula, o que geraria erro
+    */
     private List<Order> orders = new ArrayList<>();
 
+
+    /*
+        --| Constructors |--
+    */
     public User(){
 
     }
@@ -58,6 +92,10 @@ public class User implements Serializable {
         this.phone=phone;
         this.password=password;
     }
+
+    /*
+        --| Getters and Setters |--
+    */
 
     public Long getId(){
         return id;
@@ -99,9 +137,17 @@ public class User implements Serializable {
         this.password = password;
     }
 
+    //Retorna a lista de pedidos associados a este usuario
     public List<Order> getOrders(){
         return orders;
     }
+
+    /*
+        --| HashCode and Equals |--
+
+        -> Define como o objeto User é comparado com outro
+        
+    */
 
     @Override
     public int hashCode() {
