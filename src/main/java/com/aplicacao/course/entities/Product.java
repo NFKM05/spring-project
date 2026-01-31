@@ -17,11 +17,22 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
+
+/**
+* Anotation Entity identifica a classe como tabela no banco de dados
+* Table nomeia a tabela dentro do banco de dados
+*/
+
 @Entity
 @Table(name = "tb_product")
 public class Product implements Serializable {
 
     private static final long serialVersionUID=1L;
+
+    /**
+    * ID -> Identifica a chave primária da tabela no banco de dados
+    * GeneratedValue -> Identifica a regra que vai ser atribuida ao banco para incrementar o ID
+    */
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,15 +42,40 @@ public class Product implements Serializable {
     private Double price;
     private String imgUrl;
 
-    //relacao de muitos para muitos entre as tabelas produtos e categorias
+    
+    /**
+    * ManyToMany -> Define que muitos produtos podem pertencer a muitas categorias
+    * JoinTable -> Esse comando cria a tabela de junçao, a tabela associativa entre dois elementos
+    * no Banco de Dados (tb_product_category)
+    * 
+    * JoinColumns -> Define a chave estrangeira do outro objeto product_id
+    * inverseJoinColumns -> Define a chave estrangeira do outro objeto category_id
+    */
+
     @ManyToMany
     @JoinTable(name = "tb_product_category",
     joinColumns = @JoinColumn(name = "product_id"),
-    inverseJoinColumns = @JoinColumn(name = "category_id")) //setando a chave estrangeira na tabela
+    inverseJoinColumns = @JoinColumn(name = "category_id"))
+
+    /**
+    * Usando Set ao invés de List por que o mesmo não admite ter elementos repetidos,
+    * evita que um produto seja inserido em mesma categoria por erro de lógica
+    */
     private Set<Category> categories = new HashSet<>();
+
+
+    /**
+    * OneToMany -> Um produto pode estar presente em vários itens de pedido
+    * mappedBy -> id.product dentro da classe OrderItem existe um atributo id
+    * chave composta da OrderItemPK e dentro deste id que está o atributo product
+    */
 
     @OneToMany(mappedBy = "id.product")
     private Set<OrderItem> items = new HashSet<>();
+
+    /*
+         --| Constructors |--
+    */
 
     public Product(){
 
@@ -52,6 +88,10 @@ public class Product implements Serializable {
         this.price=price;
         this.imgUrl=imgUrl;
     }
+
+    /*
+        --| Getters & Setters |--
+    */
 
     public Long getId() {
         return id;
@@ -93,18 +133,29 @@ public class Product implements Serializable {
         this.imgUrl = imgUrl;
     }
 
+    //Retorna as categorias associadas a este produto
     public Set<Category> getCategories() {
         return categories;
     }
 
+    /**
+    * JsonIgnore -> Importante para evitar o loop infinito no JSON
+    * getOrders() -> Método que implementa uma lógica na classe para descobrir
+    * quais pedidos Order este produto está incluído
+    */
+
     @JsonIgnore
     public Set<Order> getOrders(){
         Set<Order> set = new HashSet<>();
-        for(OrderItem x : items){ //percorrendo a coleçao order item associado ao produto, para cada elemento add o x pegando o obj order associado a order item
+        for(OrderItem x : items){ 
             set.add(x.getOrder());
         }
         return set;
     }
+
+    /*
+        --| HashCode & Equals |--
+    */
 
 
     @Override

@@ -18,33 +18,66 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-
+/**
+* Informa ao JPA que esta classe mapeia uma tabela no banco de dados
+* cada instancia de User sera uma linha no banco
+*/
 @Entity
+
+/**
+* Define o nome propriamente dito da tabela no banco de dados ditando a 
+* tabela em que serao salvo estes dados e a que vai fazer associacao as demais
+*/
 @Table(name = "tb_order")
 public class Order implements Serializable {
 
+    /**
+    * Interface que permite o objeto ser transformado em um fluxo de bytes, essencial
+    * para quando o Spring precisa salvar o objeto em sessão, enviar via rede ou gravar
+    * em arquivos de cache 
+    */
     private static final long serialVersionUID=1L;
 
+    /**
+    * Definindo o atributo que vai ser a chave primária da tabela, e também
+    * a regra que ele usará para se incrementar
+    */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //formatando a data para garantir a conformidade em que preciso que seja salvo a data
+    /**
+    * JsonFormat -> Controla como o Jackson serializador JSON formata a data
+    * O shape garante que a data vire um texto no JSON
+    * O pattern segue o padrão ISO 8601
+    * O timezone faz com que o horário siga o padrão como horário de Greenwich UTC
+    */
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
     private Instant moment;
 
-    //setando como inteiro para controlar melhor o numero que vai ser setado
+    //Setando como inteiro para auxiliar na refatoração futuramente dos códigos no banco de dados
     private Integer orderStatus;
 
-    //fazendo a associaçao no banco de dados de chave estrangeira
+    /** 
+    * Relaçao de Muitos-Para-Muitos, muitos pedidos pertencem a um cliente
+    * JoinColumn -> Responsavel por criar a chave estrangeira FK fisica na tabela 'tb_order'
+    * diferente do mappedBy este é o lado forte da relaçao que guarda o Id do dono
+    */
     @ManyToOne
     @JoinColumn(name = "client_id")
     private User client;
 
+    /**
+    * OneToMany -> Um para muitos, um pedido possui vários itens, o mappedBy indica
+    * que o mapeamento é feito pela chave composta id na classe OrderItem acessando
+    * o campo 'order' dentro dela
+    */
     @OneToMany(mappedBy = "id.order")
     private Set<OrderItem> items = new HashSet<>();
 
-    //um para um mapeando as entidades para ter o mesmo cod, se o pedido for o 5 o pagamento tem q ser o 5 tbm
+    /**
+    *
+    */
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
     private Payment payment;
 
