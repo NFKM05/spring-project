@@ -13,22 +13,50 @@ import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
+/**
+* Entidade que representa o Pagamento
+Em um modelo de dominio o pagamento é uma extensão do pedido
+*/
+
 @Entity
 @Table(name = "tb_payment")
 public class Payment implements Serializable {
 
+    /*
+        --| Basic Entity Checks |--
+
+        Basic Attributes
+        Associations (instantiate collections)
+        Contructors
+        Getters & Setters
+        HashCode & Equals
+        Serializable
+
+    */
+
     private static final long serialVersionUID=1L;
 
+    //Id e GeneratedValue -> Identificador unico do pagamento
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Instant moment;
 
-
+    /**
+    * JsonIgnore impede que o objeto seja serializado de volta para JSON
+    * evitando o erro de recursão infinita, ficando em loop de vez pedido >> pagamento >> pedido
+    * OneToOne relaçao Um para Um, um pagamento pertence a um unico pedido
+    * MapsId anotação chave, faz com que o Id do Payment seja o mesmo Id do Order relacionado
+    * ou seja, nao existira um 'id 5' para Payment se o Order foi 'id 10'
+    */
     @JsonIgnore
     @OneToOne
     @MapsId
     private Order order;
+
+    /*
+        --| Constructors |--
+    */
 
     public Payment(){
 
@@ -39,6 +67,10 @@ public class Payment implements Serializable {
         this.moment=moment;
         this.order=order;
     }
+
+    /*
+        --| Getters and Setters |--
+    */
 
     public Long getId() {
         return id;
@@ -63,6 +95,13 @@ public class Payment implements Serializable {
     public void setOrder(Order order) {
         this.order = order;
     }
+
+    /*
+        --| HashCode and Equals |--
+
+        -> Define como o objeto Payment é comparado com outro
+        
+    */
 
     @Override
     public int hashCode() {

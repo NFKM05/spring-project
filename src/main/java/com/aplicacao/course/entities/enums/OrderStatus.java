@@ -1,9 +1,12 @@
 package com.aplicacao.course.entities.enums;
 
+/**
+* Enumeraçao representa os possiveis status de um pedido no sistema,
+* o controle é feito atraves de codigos numericos manuais para garantir
+* a consistência dos dados no banco de dados prevenindo manutençoes futuras
+*/
 public enum OrderStatus {
 
-    //setando um numero para cada tipo, por que no bd se converte em numero
-    //fica mais facil para manutencao futura e sem quebra de sequencia
     WAITING_PAYMENT(1),
     PAID(2),
     SHIPPED(3),
@@ -13,6 +16,9 @@ public enum OrderStatus {
     //setando um construtor para acessar esses numeros
     private int code;
 
+    /**
+    * Construtor privado para associar um código numerico a um status
+    */
     private OrderStatus(int code){
         this.code=code;
     }
@@ -21,6 +27,11 @@ public enum OrderStatus {
         return code;
     }
 
+    /**
+    * Converte um codigo numerico inteiro para o respectivo objeto OrderStatus,
+    * passa de parametro o codigo numerico e retorna, o objeto Enum correspondente
+    * ao codigo informado, ele lança uma exceçao caso der erro
+    */
     public static OrderStatus valueOf(int code){
         for(OrderStatus value : OrderStatus.values()){
             if(value.getCode() == code){

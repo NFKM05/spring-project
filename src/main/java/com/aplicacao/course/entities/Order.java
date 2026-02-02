@@ -31,6 +31,18 @@ import jakarta.persistence.Table;
 @Table(name = "tb_order")
 public class Order implements Serializable {
 
+    /*
+        --| Basic Entity Checks |--
+
+        Basic Attributes
+        Associations (instantiate collections)
+        Contructors
+        Getters & Setters
+        HashCode & Equals
+        Serializable
+
+    */
+
     /**
     * Interface que permite o objeto ser transformado em um fluxo de bytes, essencial
     * para quando o Spring precisa salvar o objeto em sessão, enviar via rede ou gravar
@@ -59,7 +71,7 @@ public class Order implements Serializable {
     private Integer orderStatus;
 
     /** 
-    * Relaçao de Muitos-Para-Muitos, muitos pedidos pertencem a um cliente
+    * Relaçao de Muitos-Para-Um, muitos pedidos pertencem a um cliente
     * JoinColumn -> Responsavel por criar a chave estrangeira FK fisica na tabela 'tb_order'
     * diferente do mappedBy este é o lado forte da relaçao que guarda o Id do dono
     */
@@ -76,10 +88,16 @@ public class Order implements Serializable {
     private Set<OrderItem> items = new HashSet<>();
 
     /**
-    *
+    * OneToOne -> Relaçao de Um para Um, um pedido tem exatamente um pagamento
+    * mappedBy = "order" indica que a FK esta na tabela payment
+    * cascade = CascadeType.ALL garante que se o pedido for deletado o pagamento também
     */
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
     private Payment payment;
+
+    /*
+        --| Constructors |--
+    */
 
     public Order(){
 
@@ -91,6 +109,10 @@ public class Order implements Serializable {
         setOrderStatus(orderStatus);
         this.client=client;
     }
+
+    /*
+        --| Getters and Setters |--
+    */
 
     public Long getId() {
         return id;
@@ -116,10 +138,12 @@ public class Order implements Serializable {
         this.client = client;
     }
 
+    //Converte o valor Integer salvo no banco de volta para Enum
     public OrderStatus getOrderStatus() {
         return OrderStatus.valueOf(orderStatus);
     }
 
+    //Converte o tipo Enum recebido para Integer antes de salvar no banco
     public void setOrderStatus(OrderStatus orderStatus) {
         if(orderStatus != null){ 
         this.orderStatus = orderStatus.getCode();
@@ -138,6 +162,10 @@ public class Order implements Serializable {
         return items;
     }
 
+    /**
+    * Regra de negocio -> Calcula o valor total do pedido somando os subtotais dos itens
+    * o prefixo 'get' faz com que o Jackson inclua o campo 'total' no JSON final automaticamente
+    */
     public Double getTotal(){
         double sum = 0.0;
         for(OrderItem x : items){
@@ -145,6 +173,13 @@ public class Order implements Serializable {
         }
         return sum;
     }
+
+    /*
+        --| HashCode and Equals |--
+
+        -> Define como o objeto Order é comparado com outro
+        
+    */
 
     @Override
     public int hashCode() {

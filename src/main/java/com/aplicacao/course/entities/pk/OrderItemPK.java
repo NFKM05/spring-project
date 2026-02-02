@@ -11,19 +11,45 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 
-//classe associativa para unir product e order
+/**
+* Embeddable infica que esta classe é embutivel, nao possui table propria mas
+* seus campos farão parte de outra entidade, neste caso compondo a PK de OrderItem
+*/
 @Embeddable
 public class OrderItemPK implements Serializable {
 
+    /*
+        --| Basic Entity Checks |--
+
+        Basic Attributes
+        Associations (instantiate collections)
+        Contructors
+        Getters & Setters
+        HashCode & Equals
+        Serializable
+
+    */
+
     private static final long serialVersionUID=1L;
 
+    /**
+    * ManyToOne no contexto de uma chave composta, indica que parte do ID é uma
+    * referência para outra entidade Order
+    * JoinColumn nome da coluna de chave estrangeira que será criada na tabela tb_order_item
+    */
     @ManyToOne
     @JoinColumn(name = "order_id")
     private Order order;
 
+    //Identifica o produto que faz parte dessa chave composta
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
+
+    /*
+        --| Getters and Setters |--
+    */
+
     public Order getOrder() {
         return order;
     }
@@ -37,6 +63,12 @@ public class OrderItemPK implements Serializable {
         this.product = product;
     }
 
+    /*
+        --| HashCode and Equals |--
+
+        -> Define como o objeto OrderItemPK é comparado com outro
+        
+    */
     
     @Override
     public int hashCode() {

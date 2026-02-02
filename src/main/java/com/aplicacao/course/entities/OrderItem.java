@@ -9,22 +9,50 @@ import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
-
+/**
+* Classe associativa que representa os itens de um pedido,
+* associando um Pedido a um Produto, adicionando quantidade e preço
+*/
 @Entity
 @Table(name = "tb_order_item")
 public class OrderItem implements Serializable {
 
+    /*
+        --| Basic Entity Checks |--
+
+        Basic Attributes
+        Associations (instantiate collections)
+        Contructors
+        Getters & Setters
+        HashCode & Equals
+        Serializable
+
+    */
+
     private static final long serialVersionUID=1L;
 
+    /**
+    * EmbeddedId indica que o identificador desta classe é uma chave composta
+    * que esta embutida em outra classe OrderItemPK, fundamental instanciar o objeto
+    * new OrderItemPK para nao dar NullPointerException
+    */
     @EmbeddedId 
     private OrderItemPK id = new OrderItemPK(); //quando tem id da classe associativa precisa startar com o obj
     private Integer quantity;
     private Double price;
 
+    /*
+        --| Constructors |--
+    */
+
     public OrderItem(){
 
     }
 
+    /**
+    * Construtor customizado, sem passar o id composto diretamente
+    * mas sim os objetos Order e Product, que sao atribuidos ao Id interno
+    */
     public OrderItem(Order order, Product product, Integer quantity, Double price){
         id.setOrder(order);
         id.setProduct(product);
@@ -32,7 +60,15 @@ public class OrderItem implements Serializable {
         this.price=price;
     }
 
-    @JsonIgnore //usando isto para evitar mao dupla e ficar num loop de associacao
+    /*
+        --| Getters and Setters |--
+    */
+
+    /**
+    * JsonIgnore Importante no GET para evitar que o JSON tente renderizar
+    * o pedido dentro do item, causando um loop de chamadas order >> item >> order
+    */
+    @JsonIgnore 
     public Order getOrder(){
         return id.getOrder();
     }
@@ -41,6 +77,7 @@ public class OrderItem implements Serializable {
         id.setOrder(order);
     }
 
+    //Sem a anotation JsonIgnore, pois queremos ver qual produto é o item
     public Product getProduct(){
         return id.getProduct();
     }
@@ -65,9 +102,20 @@ public class OrderItem implements Serializable {
         this.price = price;
     }
 
+    /**
+    * Essencial para o calculo do valor total do pedido
+    * O Spring/Jackson reconhecerá isso como um campo no JSON 'subtotal'
+    */
     public Double getSubTotal(){
         return price * quantity;
     }
+
+    /*
+        --| HashCode and Equals |--
+
+        -> Define como o objeto OrderItem é comparado com outro
+        
+    */
 
     @Override
     public int hashCode() {
@@ -93,7 +141,4 @@ public class OrderItem implements Serializable {
             return false;
         return true;
     }
-
-    
-
 }

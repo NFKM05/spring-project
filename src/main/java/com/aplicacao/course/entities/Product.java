@@ -27,6 +27,18 @@ import jakarta.persistence.Table;
 @Table(name = "tb_product")
 public class Product implements Serializable {
 
+    /*
+        --| Basic Entity Checks |--
+
+        Basic Attributes
+        Associations (instantiate collections)
+        Contructors
+        Getters & Setters
+        HashCode & Equals
+        Serializable
+
+    */
+
     private static final long serialVersionUID=1L;
 
     /**

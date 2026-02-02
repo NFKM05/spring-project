@@ -12,4 +12,12 @@ import com.aplicacao.course.entities.Product;
 */
 public interface ProductRepository extends JpaRepository<Product, Long>{
 
+/**
+ * Só de extender a classe de JPA ganha acessa aos métodos
+ * save(User) --> Insere um novo usuario ou atualiza se o ID ja existir
+ * findAll() --> Retorna todos os usuarios Ex:. select * from tb_user
+ * findById(id) --> Busca um usuário pelo Id
+ * deleteById(id) --> Remove um usuário do banco de dados
+ * count() --> Retorna a quantidade de registros
+ */
 }

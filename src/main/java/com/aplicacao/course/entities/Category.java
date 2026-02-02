@@ -13,9 +13,26 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
+
+/**
+* Entidade que representa as Categorias dos produtos
+* Mapeada para a tabela 'tb_category'
+*/
 @Entity
 @Table(name = "tb_category")
 public class Category implements Serializable {
+
+    /*
+        --| Basic Entity Checks |--
+
+        Basic Attributes
+        Associations (instantiate collections)
+        Contructors
+        Getters & Setters
+        HashCode & Equals
+        Serializable
+
+    */
 
     private static final long serialVersionUID=1L;
 
@@ -24,9 +41,20 @@ public class Category implements Serializable {
     private Long id;
     private String name;
 
+
+    /**
+    * JsonIgnore impede que haja um loop nas chamadas ao consultar categorias
+    * ManyToMany relaçao de Muitos para Muitos
+    * mappedBy = "categories" mapeamento principal (quem manda na relaçao e define a table auxiliar)
+    * no campo 'categories' da classe Product, esta classe Category é o lado passivo da relaçao
+    */
     @JsonIgnore
     @ManyToMany(mappedBy = "categories")
     private Set<Product> products = new HashSet<>();
+
+    /*
+        --| Constructors |--
+    */
 
     public Category(){
 
@@ -36,6 +64,10 @@ public class Category implements Serializable {
         this.id=id;
         this.name=name;
     }
+
+    /*
+        --| Getters and Setters |--
+    */
 
     public Long getId(){
         return id;
@@ -53,9 +85,21 @@ public class Category implements Serializable {
         this.name=name;
     }
 
+    
+    /**
+    * Se usa Set em vez de List para garantir que não haja repetiçao
+    * de produtos dentro de uma mesma categoria
+    */
     public Set<Product> getProducts() {
         return products;
     }
+
+    /*
+        --| HashCode and Equals |--
+
+        -> Define como o objeto Category é comparado com outro
+        
+    */
 
     @Override
     public int hashCode() {

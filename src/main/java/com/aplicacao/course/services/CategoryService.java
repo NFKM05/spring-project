@@ -8,20 +8,29 @@ import org.springframework.stereotype.Service;
 
 import com.aplicacao.course.entities.Category;
 import com.aplicacao.course.repositories.CategoryRepository;
+import com.aplicacao.course.services.exceptions.ResourceNotFoundException;
 
+/**
+* Camada de serviço responsavel por gerenciar as operaçoes de negocio,
+* permite que o Spring gerencie o ciclo de vida desta classe 
+*/
 @Service
 public class CategoryService {
 
     @Autowired
     private CategoryRepository repository;
 
+    //Retorna todas as categorias cadastradas no sistema, retornando lista de Category
     public List<Category> findAll(){
         return repository.findAll();
     }
 
+    //Busca uma categoria especifica por seu ID
     public Category findById(Long id){
+
+        //Tenta obter o objeto dentro do Optional, caso esteja vazio lança exceçao
         Optional<Category> obj = repository.findById(id);
-        return obj.get();
+        return obj.orElseThrow(() -> new ResourceNotFoundException(id));
     }
 
 }
